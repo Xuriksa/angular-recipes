@@ -5,14 +5,8 @@ import { Component } from '@angular/core';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
-  activePage: string;
+export class AppComponent {  
 
-  constructor() {
-    this.activePage = "Recipes";
-  }
-
-  navigate(path: string) {
-    this.activePage = path;
+  constructor() {    
   }
 }
