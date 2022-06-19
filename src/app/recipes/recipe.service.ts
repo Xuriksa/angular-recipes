@@ -1,9 +1,11 @@
-import { EventEmitter } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Subject, } from 'rxjs';
 import { Ingredient } from '../shared/ingredient.model';
 import { Recipe } from './recipe.model';
 
+@Injectable({providedIn: 'root'})
 export class RecipeService {  
+  recipesChanged = new Subject<Recipe[]>();
 
   private recipes: Recipe[] = [
     new Recipe(      
@@ -24,7 +26,35 @@ export class RecipeService {
         new Ingredient("Meat", 1),
       ],
     ),
+    new Recipe(
+      'Spaghetti',
+      'Tasty Spaghetti',
+      'https://www.mymusclechef.com/dw/image/v2/BDTZ_PRD/on/demandware.static/-/Sites-mmc-master-catalog/default/dwc74cea04/images/hi-res/BE008.jpg',
+      [
+        new Ingredient("Noodles", 20),
+        new Ingredient("Tomato", 3),
+      ],
+    ),
   ];
+
+  addRecipe(recipe: Recipe) {
+    this.recipes.push(recipe);
+    this.recipesChanged.next(this.recipes.slice());
+  }
+
+  updateRecipe(index: number, recipe: Recipe) {
+    if (index >= 0 && index < this.recipes.length) {
+      this.recipes[index] = recipe;
+      this.recipesChanged.next(this.recipes.slice());
+    }
+  }
+
+  deleteRecipe(index: number) {
+    if (index >= 0 && index < this.recipes.length) {
+      this.recipes.splice(index, 1);
+      this.recipesChanged.next(this.recipes.slice());
+    }
+  }
 
   getRecipes(): Recipe[] {
     return this.recipes.slice();
