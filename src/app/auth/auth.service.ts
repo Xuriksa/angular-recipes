@@ -2,9 +2,10 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, catchError, Subject, tap, throwError } from 'rxjs';
+import { environment } from 'src/environments/environment';
 import { User } from './user.model';
 
-const KEY = 'AIzaSyDXDgMwjIsuKY_wBD5tmIXTzJ6YGBbU4jw';
+const KEY = environment.firebaseAPIKey;
 
 export interface AuthResponseData {
   kind: string;
