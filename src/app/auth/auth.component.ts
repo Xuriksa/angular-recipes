@@ -1,22 +1,25 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ComponentFactoryResolver, OnDestroy, OnInit, Type, ViewChild, ViewContainerRef } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { AuthResponseData, AuthService } from './auth.service';
+import { AlertComponent } from '../shared/alert/alert.component';
 
 @Component({
   selector: 'app-auth',
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.scss'],
 })
-export class AuthComponent implements OnInit {
+export class AuthComponent implements OnInit, OnDestroy {
   isLoginMode = true;
   isLoading = false;
   error: string = null;
 
   form: FormGroup;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  closeSub: Subscription;
+
+  constructor(private authService: AuthService, private router: Router, private viewContainerRef: ViewContainerRef) {}
 
   ngOnInit(): void {
     this.form = new FormGroup({
@@ -29,6 +32,12 @@ export class AuthComponent implements OnInit {
         Validators.minLength(6),
       ]),
     });
+  }
+
+  ngOnDestroy(): void {
+    if (this.closeSub) {
+      this.closeSub.unsubscribe();
+    }
   }
 
   onSwitchMode() {
@@ -62,11 +71,26 @@ export class AuthComponent implements OnInit {
       },
       error: this.handleError,
     })
+  }  
+
+  onHandleError() {
+    this.error = null;
   }
 
-  private handleError = (errorMessage) => {
+  private showErrorAlert(message: string) {
+    const alert = this.viewContainerRef.createComponent<AlertComponent>(AlertComponent);
+    alert.instance.message = message;
+    this.closeSub = alert.instance.close.subscribe(() => {
+      this.closeSub.unsubscribe();
+      this.viewContainerRef.clear();
+      //alert.destroy();
+    });
+  }
+
+  private handleError = (errorMessage: string) => {
     console.log(errorMessage);
     this.error = errorMessage;
+    //this.showErrorAlert(errorMessage); // dynamic component
     this.isLoading = false;
   };
 }
